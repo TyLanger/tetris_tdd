@@ -1,5 +1,6 @@
+#[derive(PartialEq, Debug, Clone)]
 pub struct Block {
-    letter: String,
+    pub letter: String,
 }
 
 impl Block {
