@@ -1,9 +1,15 @@
 use crate::block::Block;
 
+#[derive(PartialEq, Debug)]
+pub enum BoardError {
+    AlreadyFalling,
+}
+
 pub struct Board {
     width: usize,
     height: usize,
     blocks: Vec<Option<Block>>,
+    already_falling: bool,
 }
 
 impl Board {
@@ -18,6 +24,7 @@ impl Board {
             width,
             height,
             blocks,
+            already_falling: false,
         }
     }
 
@@ -40,10 +47,15 @@ impl Board {
         // self.string.clone()
     }
 
-    pub fn drop(&mut self, block: Block) {
+    pub fn drop(&mut self, block: Block) -> Result<(), BoardError> {
+        if self.already_falling {
+            return Err(BoardError::AlreadyFalling);
+        }
+        self.already_falling = true;
         if let Some(elem) = self.blocks.get_mut(1) {
             *elem = Some(block);
         }
+        return Ok(());
     }
 
     fn get_row(&self, from_top: usize) -> &[Option<Block>] {
@@ -79,7 +91,7 @@ mod tests {
     #[test]
     fn top_row_has_block_rest_empty() {
         let mut board = Board::new(3, 3);
-        board.drop(Block::new("X"));
+        board.drop(Block::new("X")).unwrap();
 
         assert_eq!(
             [
