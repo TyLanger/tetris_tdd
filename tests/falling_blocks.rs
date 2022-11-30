@@ -34,3 +34,37 @@ fn at_most_one_block_falling_at_a_time() {
 
     assert_eq!(before, after);
 }
+
+#[test]
+fn block_reaches_the_bottom() {
+    let mut board = Board::new(3, 3);
+    board.drop(Block::new("X")).unwrap();
+    board.tick();
+    board.tick();
+
+    assert_eq!("...\n...\n.X.", board.to_string())
+}
+
+#[test]
+fn block_still_moving_at_bottom() {
+    let mut board = Board::new(3, 3);
+    board.drop(Block::new("X")).unwrap();
+    board.tick();
+    board.tick();
+
+    // the player should still be able to move the block
+    assert_eq!(true, board.has_falling());
+}
+
+#[test]
+fn block_stops_moving_at_bottom() {
+    let mut board = Board::new(3, 3);
+    board.drop(Block::new("X")).unwrap();
+    board.tick();
+    board.tick();
+    board.tick();
+
+    assert_eq!("...\n...\n.X.", board.to_string());
+    assert_eq!(false, board.has_falling());
+}
+

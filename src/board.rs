@@ -10,6 +10,7 @@ pub struct Board {
     height: usize,
     blocks: Vec<Option<Block>>,
     already_falling: bool,
+    current_index: usize,
 }
 
 impl Board {
@@ -25,6 +26,7 @@ impl Board {
             height,
             blocks,
             already_falling: false,
+            current_index: 0,
         }
     }
 
@@ -52,7 +54,8 @@ impl Board {
             return Err(BoardError::AlreadyFalling);
         }
         self.already_falling = true;
-        if let Some(elem) = self.blocks.get_mut(1) {
+        self.current_index = 1;
+        if let Some(elem) = self.blocks.get_mut(self.current_index) {
             *elem = Some(block);
         }
         return Ok(());
@@ -66,12 +69,26 @@ impl Board {
     }
 
     pub fn tick(&mut self) {
-        // swap top row with middle row
-        self.blocks.swap(0, 3);
-        self.blocks.swap(1, 4);
-        self.blocks.swap(2, 5);
 
-        // self.blocks.insert(index, element)
+        // find new place to swap
+        let new_index = self.current_index + self.width;
+        if new_index > self.blocks.len() {
+            // stop
+            self.already_falling = false;
+            return;
+        }
+        // swap below you
+        self.blocks.swap(self.current_index, new_index);
+        self.current_index = new_index;
+        
+    }
+
+    pub fn has_falling(&self) -> bool {
+        self.already_falling
+    }
+
+    fn index_from_xy(&self, x: usize, y: usize) -> usize {
+        x + y * self.width
     }
 }
 
