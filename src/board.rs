@@ -1,6 +1,8 @@
+use std::fmt::Display;
+
 use crate::block::Block;
 
-#[derive(PartialEq, Debug)]
+#[derive(PartialEq, Eq, Debug)]
 pub enum BoardError {
     AlreadyFalling,
 }
@@ -11,6 +13,28 @@ pub struct Board {
     blocks: Vec<Option<Block>>,
     already_falling: bool,
     current_index: usize,
+}
+
+impl Display for Board {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut s = "".to_string();
+        for row in 0..self.height {
+            let row = self.get_row(row);
+            let mut row_string = "".to_string();
+            for block in row {
+                let letter = if let Some(b) = block {
+                    b.letter.clone()
+                } else {
+                    ".".to_string()
+                };
+                row_string = format!("{}{}", row_string, letter);
+            }
+            s = format!("{}{}\n", s, row_string);
+        }
+        // s.trim_end().to_string();
+
+        write!(f, "{}", s.trim_end())
+    }
 }
 
 impl Board {
@@ -30,25 +54,6 @@ impl Board {
         }
     }
 
-    pub fn to_string(&self) -> String {
-        let mut s = "".to_string();
-        for row in 0..self.height {
-            let row = self.get_row(row);
-            let mut row_string = "".to_string();
-            for block in row {
-                let letter = if let Some(b) = block {
-                    b.letter.clone()
-                } else {
-                    ".".to_string()
-                };
-                row_string = format!("{}{}", row_string, letter);
-            }
-            s = format!("{}{}\n", s, row_string);
-        }
-        s.trim_end().to_string()
-        // self.string.clone()
-    }
-
     pub fn drop(&mut self, block: Block) -> Result<(), BoardError> {
         if self.already_falling {
             return Err(BoardError::AlreadyFalling);
@@ -58,7 +63,7 @@ impl Board {
         if let Some(elem) = self.blocks.get_mut(self.current_index) {
             *elem = Some(block);
         }
-        return Ok(());
+        Ok(())
     }
 
     fn get_row(&self, from_top: usize) -> &[Option<Block>] {
@@ -69,10 +74,13 @@ impl Board {
     }
 
     pub fn tick(&mut self) {
-
         // find new place to swap
         let new_index = self.current_index + self.width;
-        if new_index > self.blocks.len() {
+
+        let out_of_bounds = new_index > self.blocks.len();
+        // let block_below = self.blocks.get(new_index).unwrap().is_some();
+
+        if out_of_bounds || self.blocks.get(new_index).unwrap().is_some() {
             // stop
             self.already_falling = false;
             return;
@@ -80,14 +88,13 @@ impl Board {
         // swap below you
         self.blocks.swap(self.current_index, new_index);
         self.current_index = new_index;
-        
     }
 
     pub fn has_falling(&self) -> bool {
         self.already_falling
     }
 
-    fn index_from_xy(&self, x: usize, y: usize) -> usize {
+    fn _index_from_xy(&self, x: usize, y: usize) -> usize {
         x + y * self.width
     }
 }

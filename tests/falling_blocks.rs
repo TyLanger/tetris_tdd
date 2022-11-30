@@ -68,3 +68,68 @@ fn block_stops_moving_at_bottom() {
     assert_eq!(false, board.has_falling());
 }
 
+#[test]
+fn can_drop_second_block() {
+    let mut board = Board::new(3, 3);
+    board.drop(Block::new("X")).unwrap();
+    board.tick();
+    board.tick();
+    board.tick();
+
+    assert_eq!("...\n...\n.X.", board.to_string());
+    assert_eq!(false, board.has_falling());
+
+    board.drop(Block::new("Y")).unwrap();
+    assert_eq!(".Y.\n...\n.X.", board.to_string());
+    assert_eq!(true, board.has_falling());
+}
+
+#[test]
+fn is_still_moving_on_row_above_other_block() {
+    let mut board = Board::new(3, 3);
+    board.drop(Block::new("X")).unwrap();
+    board.tick();
+    board.tick();
+    board.tick();
+
+    assert_eq!("...\n...\n.X.", board.to_string());
+    assert_eq!(false, board.has_falling());
+
+    board.drop(Block::new("Y")).unwrap();
+    board.tick();
+
+    assert_eq!("...\n.Y.\n.X.", board.to_string());
+    assert_eq!(true, board.has_falling());
+}
+
+#[test]
+fn new_block_stops_on_top_of_old_block() {
+    let mut board = Board::new(3, 3);
+    board.drop(Block::new("X")).unwrap();
+    board.tick();
+    board.tick();
+    board.tick();
+    board.drop(Block::new("Y")).unwrap();
+    board.tick();
+    board.tick();
+
+    assert_eq!("...\n.Y.\n.X.", board.to_string());
+    assert_eq!(false, board.has_falling());
+}
+
+#[test]
+fn third_block_stacks() {
+    let mut board = Board::new(3, 3);
+    board.drop(Block::new("X")).unwrap();
+    board.tick();
+    board.tick();
+    board.tick();
+    board.drop(Block::new("Y")).unwrap();
+    board.tick();
+    board.tick();
+    board.drop(Block::new("Z")).unwrap();
+    board.tick();
+
+    assert_eq!(".Z.\n.Y.\n.X.", board.to_string());
+    assert_eq!(false, board.has_falling());
+}
