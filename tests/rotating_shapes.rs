@@ -51,3 +51,29 @@ fn big_shape_can_be_rotated_left() {
 
     assert_eq!("EJOTYDINSXCHMRWBGLQVAFKPU".to_string(), shape.to_string());
 }
+
+#[test]
+fn rotate_right_immutable() {
+    let shape = RotatingShape::new("ABCDEFGHIJKLMNOPQRSTUVWXY");
+
+    // return a new shape
+    // don't edit the current one
+    assert_eq!(
+        "UPKFAVQLGBWRMHCXSNIDYTOJE".to_string(),
+        shape.from_rotate_right().to_string()
+    );
+    assert_eq!("ABCDEFGHIJKLMNOPQRSTUVWXY".to_string(), shape.to_string());
+}
+
+#[test]
+fn rotate_left_immutable() {
+    let shape = RotatingShape::new("ABCDEFGHIJKLMNOPQRSTUVWXY");
+
+    // return a new shape
+    // don't edit the current one
+    assert_eq!(
+        "EJOTYDINSXCHMRWBGLQVAFKPU".to_string(),
+        shape.from_rotate_left().to_string()
+    );
+    assert_eq!("ABCDEFGHIJKLMNOPQRSTUVWXY".to_string(), shape.to_string());
+}
